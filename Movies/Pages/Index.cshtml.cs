@@ -64,11 +64,65 @@ namespace Movies.Pages
             SearchTerms = Request.Query["SearchTerms"];
             MPAARatings = Request.Query["MPAARatings"];
             Genres = Request.Query["Genres"];
-            Movies = MovieDatabase.Search(SearchTerms);
+            Movies = MovieDatabase.All;
+            // Search movie titles for the SearchTerms
+            if (SearchTerms != null)
+            {
+                Movies = Movies.Where(movie => movie.Title != null && movie.Title.Contains(SearchTerms, StringComparison.InvariantCultureIgnoreCase));
+            }
+            // Filter by MPAA Rating 
+            if (MPAARatings != null && MPAARatings.Length != 0)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.MPAARating != null &&
+                    MPAARatings.Contains(movie.MPAARating)
+                    );
+            }
+            // Filter by Genre Rating 
+            if (Genres != null && Genres.Length != 0)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.MajorGenre != null &&
+                    Genres.Contains(movie.MajorGenre)
+                    );
+            }
+            // Filter by IMDB Rating 
+            if (IMDBMin == null && IMDBMax != null)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.IMDBRating <= IMDBMax);
+            }
+            if (IMDBMin != null && IMDBMax == null)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.IMDBRating >= IMDBMin);
+            }
+            if (IMDBMin != null && IMDBMax != null)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.IMDBRating >= IMDBMin && movie.IMDBRating <= IMDBMax);
+            }
+            // Filter by Roten Tomatoes Rating 
+            if (MinTomato == null && MaxTomato != null)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.RottenTomatoesRating <= MaxTomato);
+            }
+            if (MinTomato != null && MaxTomato == null)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.RottenTomatoesRating >= MinTomato);
+            }
+            if (MinTomato != null && MaxTomato != null)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.RottenTomatoesRating >= MinTomato && movie.RottenTomatoesRating <= MaxTomato);
+            }
+            /*Movies = MovieDatabase.Search(SearchTerms);
             Movies = MovieDatabase.FilterByMPAARating(Movies, MPAARatings);
             Movies = MovieDatabase.FilterByGenre(Movies, Genres);
             Movies = MovieDatabase.FilterByIMDBRating(Movies, IMDBMin, IMDBMax);
-            Movies = MovieDatabase.FilterByTomatoesRating(Movies, MinTomato, MaxTomato);
+            Movies = MovieDatabase.FilterByTomatoesRating(Movies, MinTomato, MaxTomato);*/
         }
     }
 }
